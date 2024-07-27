@@ -4,7 +4,7 @@ const createUser = async (req, res) => {
   const user = new User(req.body);
   try {
     const doc = await user.save();
-    res.status(201).jso({ id: doc.id, role: doc.role });
+    res.status(201).json({ id: doc.id, role: doc.role });
   } catch (error) {
     res.status(400).json(error);
   }
