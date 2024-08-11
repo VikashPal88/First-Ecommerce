@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema({
     unique: true,
   },
   password: {
-    type: String,
+    type: Buffer,
     required: true,
   },
   role: {
@@ -23,7 +23,9 @@ const userSchema = mongoose.Schema({
   orders: { type: [Mixed] },
   addresses: {
     type: [Mixed],
+    default: [],
   },
+  salt: Buffer,
 });
 
 userSchema.virtual("id").get(function () {

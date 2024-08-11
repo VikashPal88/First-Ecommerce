@@ -1,31 +1,27 @@
-const User = require("../models/user.model");
+const User = require("../models/user.model.js");
 
 const fetchUserById = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.user;
   try {
     const user = await User.findById(id).exec();
-    res.status(400).json(user);
+    res.status(200).json({
+      id: user.id,
+      addresses: user.addresses,
+      email: user.email,
+      role: user.role,
+    });
   } catch (err) {
     res.status(400).json(err);
   }
 };
 
-// const createUser = async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const user = await User.findByIdAndUpdate(id, req.body, { new: true });
-//     res.status(200).json(user);
-//   } catch (error) {
-//     res.status(400).json(error);
-//   }
-// };
-
 const updateUser = async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findByIdAndUpdate(id, req.body, { new: true });
-    res.status(201).jso(user);
+    res.status(200).json(user);
   } catch (error) {
+    console.log(error);
     res.status(400).json(error);
   }
 };
