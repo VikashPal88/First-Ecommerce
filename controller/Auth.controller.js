@@ -6,6 +6,7 @@ const { sanitizeUser } = require("../services/common");
 
 const createUser = async (req, res) => {
   try {
+<<<<<<< HEAD
     const salt = crypto.randomBytes(16);
     crypto.pbkdf2(
       req.body.password,
@@ -39,6 +40,10 @@ const createUser = async (req, res) => {
         });
       }
     );
+=======
+    const doc = await user.save();
+    res.status(201).json({ id: doc.id, role: doc.role });
+>>>>>>> add8311e56249c98a991c31dda969c02026783db
   } catch (error) {
     res.status(400).json(error);
   }
