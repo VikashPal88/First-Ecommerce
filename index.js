@@ -26,10 +26,6 @@ const app = express();
 //webhook
 const endpointSecret = process.env.ENDPOINT_SECRET;
 
-const calculateOrderAmount = (items) => {
-  return 14000;
-};
-
 app.post(
   "/webhook",
   express.raw({ type: "application/json" }),
@@ -98,7 +94,7 @@ app.use("/users", isAuth(), usersRouter.router);
 app.use("/auth", authRouter.router);
 app.use("/cart", isAuth(), cartRouter.router);
 app.use("/orders", isAuth(), orderRouter.router);
-app.use("*", (req, res) => res.sendFile(path.resolve("dist", "index.html")));
+app.get("*", (req, res) => res.sendFile(path.resolve("dist", "index.html")));
 
 // Password Strategies
 passport.use(
