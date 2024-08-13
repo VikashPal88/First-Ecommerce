@@ -10,6 +10,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const crypto = require("crypto");
 const dotenv = require("dotenv").config();
 const cookieParser = require("cookie-parser");
+const path = require("path");
 const productRouters = require("./routes/products.routes");
 const categoriesRouters = require("./routes/category.routes");
 const brandsRouters = require("./routes/brands.routes");
@@ -24,6 +25,10 @@ const app = express();
 
 //webhook
 const endpointSecret = process.env.ENDPOINT_SECRET;
+
+const calculateOrderAmount = (items) => {
+  return 14000;
+};
 
 app.post(
   "/webhook",
@@ -43,10 +48,12 @@ app.post(
     // Handle the event
     switch (event.type) {
       case "payment_intent.succeeded":
-        const paymentIntentSucceeded = event.data.object;
-        const order = await Order.findById(
-          paymentIntentSucceeded.metadata.orderId
-        );
+        // const paymentIntentSucceeded = event.data.object;
+        // const order = await Order.findById(
+        //   paymentIntentSucceeded.metadata.orderId
+        // );
+        // order.paymentStatus = "received";
+        // await order.save();
 
         // Then define and call a function to handle the event payment_intent.succeeded
         break;
@@ -67,7 +74,7 @@ opts.secretOrKey = process.env.JWT_SECRET_KEY;
 
 // middlewears
 
-app.use(express.static("dist"));
+app.use(express.static(path.resolve(__dirname, "dist")));
 app.use(cookieParser());
 app.use(
   session({
@@ -83,7 +90,7 @@ app.use(
   })
 );
 // app.use(express.raw({ type: "application/json" }));
-app.use(express.json()); //to parse req.body
+app.use(express.json({ limit: "50mb" })); //to parse req.body
 app.use("/products", isAuth(), productRouters.router);
 app.use("/categories", isAuth(), categoriesRouters.router);
 app.use("/brands", isAuth(), brandsRouters.router);
@@ -126,7 +133,6 @@ passport.use(
         }
       );
     } catch (error) {
-      console.log(error);
       return done(error);
     }
   })
@@ -135,7 +141,6 @@ passport.use(
 passport.use(
   "jwt",
   new JwtStrategy(opts, async function (jwt_payload, done) {
-    console.log("jwt", jwt_payload, opts);
     try {
       const user = await User.findById(jwt_payload.id);
       if (user) {
@@ -169,13 +174,10 @@ passport.deserializeUser(function (user, cb) {
 const stripe = require("stripe")(process.env.STRIPE_SERVER_KEY);
 
 app.post("/create-payment-intent", async (req, res) => {
-  const { totalAmount } = req.body;
-
-  // Create a PaymentIntent with the order amount and currency
+  const { items } = req.body;
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: totalAmount * 100, // for decial compensation
+    amount: calculateOrderAmount(items),
     currency: "inr",
-    // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
     automatic_payment_methods: {
       enabled: true,
     },
@@ -184,10 +186,6 @@ app.post("/create-payment-intent", async (req, res) => {
   res.send({
     clientSecret: paymentIntent.client_secret,
   });
-});
-
-app.get("/", (req, res) => {
-  res.json({ status: "success" });
 });
 
 main().catch((err) => console.log(err));

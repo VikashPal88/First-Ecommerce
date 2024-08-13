@@ -14,7 +14,6 @@ const fetchOrderByUser = async (req, res) => {
 
 const createOrder = async (req, res) => {
   const order = new Order(req.body);
-
   console.log("order", order);
   try {
     const doc = await order.save();

@@ -3,7 +3,7 @@ const User = require("../models/user.model.js");
 const fetchUserById = async (req, res) => {
   const { id } = req.user;
   try {
-    const user = await User.findById(id).exec();
+    const user = await User.findById(id);
     res.status(200).json({
       id: user.id,
       addresses: user.addresses,

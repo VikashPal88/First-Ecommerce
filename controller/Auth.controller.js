@@ -6,12 +6,11 @@ const { sanitizeUser } = require("../services/common");
 
 const createUser = async (req, res) => {
   try {
-<<<<<<< HEAD
     const salt = crypto.randomBytes(16);
     crypto.pbkdf2(
       req.body.password,
       salt,
-      31000,
+      310000,
       32,
       "sha256",
       async (err, hashedPassword) => {
@@ -26,7 +25,7 @@ const createUser = async (req, res) => {
             res.status(400).json(err);
           } else {
             const token = jwt.sign(
-              sanitizeUser(user),
+              sanitizeUser(doc),
               process.env.JWT_SECRET_KEY
             );
             res
@@ -35,15 +34,11 @@ const createUser = async (req, res) => {
                 httpOnly: true,
               })
               .status(201)
-              .json({ token });
+              .json({ id: doc.id, role: doc.role });
           }
         });
       }
     );
-=======
-    const doc = await user.save();
-    res.status(201).json({ id: doc.id, role: doc.role });
->>>>>>> add8311e56249c98a991c31dda969c02026783db
   } catch (error) {
     res.status(400).json(error);
   }
@@ -57,15 +52,12 @@ const loginUser = async (req, res) => {
       httpOnly: true,
     })
     .status(200)
-    .json(user);
+    .json({ id: user.id, role: user.role });
 };
 
 const checkAuth = async (req, res) => {
-  const user = req.user;
-  console.log("checauth", user);
   if (req.user) {
-    console.log("user", user);
-    res.json(user);
+    res.json(req.user);
   } else {
     res.sendStatus(401);
   }
