@@ -48,12 +48,12 @@ app.post(
     // Handle the event
     switch (event.type) {
       case "payment_intent.succeeded":
-        // const paymentIntentSucceeded = event.data.object;
-        // const order = await Order.findById(
-        //   paymentIntentSucceeded.metadata.orderId
-        // );
-        // order.paymentStatus = "received";
-        // await order.save();
+        const paymentIntentSucceeded = event.data.object;
+        const order = await Order.findById(
+          paymentIntentSucceeded.metadata.orderId
+        );
+        order.paymentStatus = "received";
+        await order.save();
 
         // Then define and call a function to handle the event payment_intent.succeeded
         break;
@@ -98,6 +98,7 @@ app.use("/users", isAuth(), usersRouter.router);
 app.use("/auth", authRouter.router);
 app.use("/cart", isAuth(), cartRouter.router);
 app.use("/orders", isAuth(), orderRouter.router);
+app.use("*", (req, res) => res.sendFile(path.resolve("dist", "index.html")));
 
 // Password Strategies
 passport.use(
@@ -174,12 +175,15 @@ passport.deserializeUser(function (user, cb) {
 const stripe = require("stripe")(process.env.STRIPE_SERVER_KEY);
 
 app.post("/create-payment-intent", async (req, res) => {
-  const { items } = req.body;
+  const { totalAmount, orderId } = req.body;
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: calculateOrderAmount(items),
+    amount: totalAmount * 100,
     currency: "inr",
     automatic_payment_methods: {
       enabled: true,
+    },
+    metadata: {
+      orderId,
     },
   });
 
