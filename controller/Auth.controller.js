@@ -46,6 +46,7 @@ const createUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const user = req.user;
+  console.log(user);
   res
     .cookie("jwt", user.token, {
       expires: new Date(Date.now() + 3600000),

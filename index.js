@@ -105,27 +105,35 @@ passport.use(
     done
   ) {
     try {
-      const user = await User.findOne({ email: email }).exec();
-
+      const user = await User.findOne({ email: email });
+      console.log(email, password, user);
       if (!user) {
         return done(null, false, { message: "invalid credentials" });
       }
       crypto.pbkdf2(
         password,
         user.salt,
-        31000,
+        310000,
         32,
         "sha256",
         async (err, hashedPassword) => {
           if (err) return done(err);
+
           if (!crypto.timingSafeEqual(user.password, hashedPassword)) {
+            console.log("error hai");
             return done(null, false, { message: "invalid credentials" });
           }
+
+          //     if (!crypto.timingSafeEqual(storedPasswordBuffer, hashedPassword)) {
+          //     console.log("error hai");
+          //     return done(null, false, { message: "invalid credentials" });
+          // }
           const token = jwt.sign(
             sanitizeUser(user),
             process.env.JWT_SECRET_KEY,
             { expiresIn: "5h" }
           );
+          console.log({ id: user.id, role: user.role, token });
           return done(null, { id: user.id, role: user.role, token });
         }
       );

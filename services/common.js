@@ -4,15 +4,6 @@ exports.isAuth = (req, res, done) => {
   return passport.authenticate("jwt", { session: false });
 };
 
-// exports.isAuth = (req, res, done) => {
-//   return passport.authenticate("jwt", { session: false }, (err, user, info) => {
-//     if (err) return done(err, false);
-//     if (!user) return res.status(401).json({ message: "Unauthorized" });
-//     req.user = user; // Attach user to request object
-//     done();
-//   })(req, res, done);
-// };
-
 exports.sanitizeUser = (user) => {
   return { id: user.id, role: user.role };
 };
@@ -24,6 +15,6 @@ exports.cookieExtractor = function (req) {
   }
   // Tdod thisi s temperoary
   // token =
-  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YmIyNjZmNDcwY2FlOGE3ZDI5NTEyMCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzIzNTQxMTAzfQ.0GdaFs5-x0Y2Mzsi3J9oeLpWIokydYbSnYQJpzrL6wA";
+  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YzA5NjVmMjczMzI0NThhZWE0NzRlNSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzIzODk3NTQ5LCJleHAiOjE3MjM5MTU1NDl9.5S8Z3NZkn_nslV0ktGZ8AyCJauvBESfNSh0BhF7I9yk";
   return token;
 };
